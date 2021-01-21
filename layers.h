@@ -10,11 +10,5 @@ enum layers {
 };
 
 enum custom_keycodes {
-  QWERTY = SAFE_RANGE,
-  LOWER,
-  RAISE,
-  ADJUST,
-  GAME,
-  WEAPON,
-  RGBRST
+  RGBRST = SAFE_RANGE
 };

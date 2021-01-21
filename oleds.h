@@ -13,7 +13,7 @@ void render_logo(void) {
         0xa0, 0xa1, 0xa2, 0xa3, 0xa4,
         0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0};
     oled_write_P(dokuu_logo, false);
-    oled_write_P(PSTR("DOKUU"), false);
+    oled_write_P(PSTR(" UWU "), false);
 }
 
 // Gaming layer Testing

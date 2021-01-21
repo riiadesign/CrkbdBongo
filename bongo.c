@@ -2,8 +2,6 @@
 
 #pragma once
 
-extern uint8_t is_master;
-
 #define IDLE_FRAMES 5
 #define IDLE_SPEED 60
 #define TAP_FRAMES 2
@@ -17,6 +15,19 @@ uint32_t anim_sleep = 0;
 uint8_t current_idle_frame = 0;
 uint8_t current_tap_frame = 0;
 
+// Terminal blinker
+void render_prompt(void) {
+    bool blink = (timer_read() % 1000) < 500;
+    if (layer_state_is(_LOWER)) {
+        oled_write_ln_P(blink ? PSTR("> lo_") : PSTR("> lo "), false);
+    } else if (layer_state_is(_RAISE)) {
+        oled_write_ln_P(blink ? PSTR("> hi_") : PSTR("> hi "), false);
+    } else if (layer_state_is(_ADJUST)) {
+        oled_write_ln_P(blink ? PSTR("> aj_") : PSTR("> aj "), false);
+    } else {
+        oled_write_ln_P(blink ? PSTR("> _ ") : PSTR(">     "), false);
+    }
+};
 
 // Bongo Cat
 static void render_anim(void) {
@@ -105,10 +116,7 @@ static void render_anim(void) {
             oled_write_raw_P(tap[abs((TAP_FRAMES-1)-current_tap_frame)], ANIM_SIZE);
         }
     }
-
     if (get_current_wpm() != 000) {
-        oled_on();
-
         if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
             anim_timer = timer_read32();
             animation_phase();
@@ -116,13 +124,9 @@ static void render_anim(void) {
 
         anim_sleep = timer_read32();
     } else {
-        if (timer_elapsed32(anim_sleep) > OLED_TIMEOUT) {
-            oled_off();
-        } else {
-            if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
-                anim_timer = timer_read32();
-                animation_phase();
-            }
+        if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
+            anim_timer = timer_read32();
+            animation_phase();
         }
     }
 }
