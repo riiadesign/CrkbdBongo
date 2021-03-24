@@ -11,6 +11,7 @@ extern rgblight_config_t rgblight_config;
 
 int RGB_current_mode;
 uint16_t oled_timer;
+bool key_pressed;
 
 layer_state_t layer_state_set_user(layer_state_t state) {
   return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
@@ -63,11 +64,10 @@ void render_status_secondary(void) {
 
 // Oled Sleeps
 void oled_task_user(void) {
-    if (timer_elapsed(oled_timer) > OLED_TIMEOUT) {
+    if (!key_pressed || timer_elapsed(oled_timer) > OLED_TIMEOUT) {
+      key_pressed = false;
       oled_off();
       return;
-    } else {
-      oled_on();
     }
     // Establishing Sides
     if (is_keyboard_left()) {
@@ -82,6 +82,7 @@ void oled_task_user(void) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (record->event.pressed) {
     oled_timer = timer_read();
+    key_pressed = true;
   }
 
   switch (keycode) {
