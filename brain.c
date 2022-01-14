@@ -1,5 +1,6 @@
 // ObliviousGmn // Dokuu // October 2020 // Big Brain
 
+#include <stdio.h>
 #include "bongo.c"
 
 extern keymap_config_t keymap_config;
@@ -25,7 +26,7 @@ void matrix_init_user(void) {
 }
 
 // Oled Rotations
-#ifdef OLED_DRIVER_ENABLE
+#ifdef OLED_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
   if (is_keyboard_left()) {
     return OLED_ROTATION_270;
@@ -54,7 +55,7 @@ void render_status_secondary(void) {
         //render_game_r();
         testing_game();
         break;
-   case _WEAPON:
+    case _WEAPON:
         //render_weapon_r();
         break;
     default:
@@ -63,56 +64,22 @@ void render_status_secondary(void) {
 }
 
 // Oled Sleeps
-void oled_task_user(void) {
-    if (!key_pressed || timer_elapsed(oled_timer) > OLED_TIMEOUT) {
-      key_pressed = false;
-      oled_off();
-      return;
-    }
+bool oled_task_user(void) {
+
     // Establishing Sides
-    if (is_keyboard_left()) {
+    if (is_keyboard_master()) {
         render_status_main();
     } else {
         render_status_secondary();
     }
+    return false;
 }
 #endif
 
-// Oled Wakes
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  if (record->event.pressed) {
-    oled_timer = timer_read();
-    key_pressed = true;
-  }
-
-  switch (keycode) {
-    case RGBRST:
-      #ifdef RGBLIGHT_ENABLE
-        if (record->event.pressed) {
-          eeconfig_update_rgblight_default();
-          rgblight_enable();
-          RGB_current_mode = rgblight_config.mode;
-        }
-      #endif
-      #ifdef RGB_MATRIX_ENABLE
-        if (record->event.pressed) {
-          eeconfig_update_rgb_matrix_default();
-          rgb_matrix_enable();
-        }
-      #endif
-      break;
-  }
-  return true;
-}
-
-#ifdef RGB_MATRIX_ENABLE
-
-void suspend_power_down_keymap(void) {
-    rgb_matrix_set_suspend_state(true);
-}
-
-void suspend_wakeup_init_keymap(void) {
-    rgb_matrix_set_suspend_state(false);
-}
-
-#endif
+// // Keypressed
+// bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+//   if (record->event.pressed) {
+//     set_keylog(keycode, record);
+  
+//   return true;
+// }
